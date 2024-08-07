@@ -10,7 +10,7 @@ router.get("/", (req, res) => {
       .getProductsByCategory(req.query.category)
       .then(resultsSend(res), errorSend(res));
   } else {
-    db_products.getProducts().then(resultsSend(res), errorSend(res));
+    db_products.getProducts().then(resultsSend(res));
   }
 });
 router.get("/:productId", (req, res) => {

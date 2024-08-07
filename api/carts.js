@@ -1,12 +1,13 @@
-var express = require("express");
+const express = require("express");
 const db_carts = require("../db/db_carts");
+const db_orders = require("../db/db_orders");
 const { resultsSend, errorSend } = require("../soft/soft");
 
 const router = express.Router();
 
 router.get("/:cartId", (req, res) => {
   db_carts
-    .getCartById(req.params.cartId)
+    .getCartProductsById(req.params.cartId)
     .then(resultsSend(res), errorSend(res));
 });
 
@@ -25,10 +26,35 @@ router.post("/", (req, res) => {
 });
 router.post("/:cartId", (req, res) => {
   db_carts
-    .addProductToCart(req.params.cartId, req.body.product_id)
+    .cartCheckByIdAndProduct(req.params.cartId, req.body.product_id)
+    .then((results) => {
+      if (results.length == 0) {
+        db_carts
+          .addProductToCart(req.params.cartId, req.body.product_id)
+          .then(
+            (results) =>
+              res.status(201).send(`Cart updated with ID: ${results.cart_id}`),
+            errorSend(res)
+          );
+      } else {
+        res.status(400).send("Dont repeat positions in cart");
+      }
+    });
+});
+
+// checkout
+router.post("/:cartId/checkout", (req, res) => {
+  db_carts
+    .getUserByCardId(req.params.cartId)
     .then(
       (results) =>
-        res.status(201).send(`Cart updated with ID: ${results.cart_id}`),
+        db_orders
+          .addOrder(results, req.params.cartId)
+          .then((results) =>
+            res
+              .status(201)
+              .send(`CONGRATULATIONS, new order with id ${results.id}`)
+          ),
       errorSend(res)
     );
 });

@@ -2,7 +2,7 @@ const db = require("../db/db");
 
 // GET
 function getUsers() {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     db.query2("SELECT * FROM users", (error, results) => {
       if (error) {
         throw error;

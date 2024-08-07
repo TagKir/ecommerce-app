@@ -2,7 +2,7 @@ const db = require("../db/db");
 
 // GET
 function getProducts() {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     db.query2("SELECT * FROM products", (error, results) => {
       if (error) {
         throw error;

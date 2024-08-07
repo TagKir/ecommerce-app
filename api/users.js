@@ -59,7 +59,7 @@ passport.use(
 );
 
 router.get("/", (req, res) => {
-  db_users.getUsers().then(resultsSend(res), errorSend(res));
+  db_users.getUsers().then(resultsSend(res));
 });
 router.get("/:userId", (req, res) => {
   db_users
