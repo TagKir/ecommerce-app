@@ -11,29 +11,25 @@ function getUsers() {
     });
   });
 }
-function getUserById(req) {
+function getUserById(id) {
   return new Promise((resolve, reject) => {
-    db.query3(
-      "SELECT * FROM users WHERE id = $1",
-      [req.params.userId],
-      (error, results) => {
-        if (error) {
-          throw error;
-        } else if (Object.keys(results.rows).length === 0) {
-          reject(new Error(`No users with id ${req.params.userId}`));
-        }
-        resolve(results.rows[0]);
+    db.query3("SELECT * FROM users WHERE id = $1", [id], (error, results) => {
+      if (error) {
+        throw error;
+      } else if (Object.keys(results.rows).length === 0) {
+        reject(new Error(`No users with id ${id}`));
       }
-    );
+      resolve(results.rows[0]);
+    });
   });
 }
 
 // POST
-function registerUser(req) {
+function registerUser(body) {
   return new Promise((resolve, reject) => {
     db.query3(
       "INSERT INTO users(username, password, full_name, created_at) VALUES ($1, $2, $3, $4) RETURNING *",
-      [req.body.username, req.body.password, req.body.full_name, new Date()],
+      [body.username, body.password, body.full_name, new Date()],
       (error, results) => {
         if (error) {
           throw error;
@@ -47,16 +43,16 @@ function registerUser(req) {
 }
 
 //PUT
-function updateUser(req) {
+function updateUser(body, id) {
   return new Promise((resolve, reject) => {
     db.query3(
       "UPDATE users SET username = $1, password = $2 WHERE id = $3",
-      [req.body.username, req.body.password, req.params.userId],
+      [body.username, body.password, id],
       (error, results) => {
         if (error) {
           throw error;
         }
-        getUserById(req).then(
+        getUserById(id).then(
           (results) => resolve(),
           (error) => reject(new Error(error.message))
         );

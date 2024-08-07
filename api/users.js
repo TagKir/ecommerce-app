@@ -34,7 +34,7 @@ passport.deserializeUser((user, done) => {
     }
     done(null, results.rows[0]);
   });
-});
+}); //! УБРАТЬ
 
 passport.use(
   new LocalStrategy(function (username, password, cb) {
@@ -62,7 +62,9 @@ router.get("/", (req, res) => {
   db_users.getUsers().then(resultsSend(res), errorSend(res));
 });
 router.get("/:userId", (req, res) => {
-  db_users.getUserById(req).then(resultsSend(res), errorSend(res));
+  db_users
+    .getUserById(req.params.userId)
+    .then(resultsSend(res), errorSend(res));
 });
 
 router.post("/login", passport.authenticate("local"), (req, res) => {
@@ -72,7 +74,7 @@ router.post("/login", passport.authenticate("local"), (req, res) => {
 });
 router.post("/register", (req, res) => {
   db_users
-    .registerUser(req)
+    .registerUser(req.body)
     .then(
       (results) => res.status(201).send(`User added with ID: ${results.id}`),
       errorSend(res)
@@ -81,7 +83,7 @@ router.post("/register", (req, res) => {
 
 router.put("/:userId", (req, res) => {
   db_users
-    .updateUser(req)
+    .updateUser(req.body, req.params.userId)
     .then(
       (results) =>
         res.status(200).send(`User modified with ID: ${req.params.userId}`),
